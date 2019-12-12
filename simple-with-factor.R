@@ -73,8 +73,8 @@ create <- function(spec, state) {
     N <- switch(
       Norig,
       one          = 1,
-      zero_or_more = rpois(1, 1.5),
-      one_or_more  = rpois(1, 1.5) + 1,
+      zero_or_more = rpois(1, 1.0),
+      one_or_more  = rpois(1, 1.0) + 1,
       zero_or_one  = sample(c(0, 1), 1),
       stop("Ugh N = ", N)
     )
