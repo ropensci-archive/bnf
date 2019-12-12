@@ -28,6 +28,10 @@ simple <- list(
       N    = 'zero_or_more'
     )
   ),
+  factor = list(
+    list(items = list('-'), N = 'zero_or_one'),
+    list(items = list('(', 'expr', ')'), N = 'one')
+  ),
   number = list(
     items = as.list(as.character(0:9)),
     N     = 'one_or_more',
@@ -57,6 +61,7 @@ create <- function(spec) {
       one          = 1,
       zero_or_more = rpois(1, 1.5),
       one_or_more  = rpois(1, 1.5) + 1,
+      zero_or_one  = sample(c(0, 1), 1),
       stop("Ugh N = ", N)
     )
 
@@ -87,7 +92,7 @@ zz <- create(simple$expr)
 zz
 eval(parse(text = zz))
 
-
+create(simple$factor)
 
 
 
