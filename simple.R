@@ -9,8 +9,8 @@ simple <- list(
     list(items = list('term'), N = 'one'),
     list(
       items = list(
-        list(items = list('+', 'term'), N = 'one'),
-        list(items = list('-', 'term'), N = 'one')
+        list(items = list('op', 'term'), N = 'one'),
+        list(items = list('op', 'term'), N = 'one')
       ),
       type = 'choice',
       N    = 'zero_or_more'
@@ -20,12 +20,25 @@ simple <- list(
     list(items = list('number'), N = 'one', type = 'all'),
     list(
       items = list(
-        list(items = list('*', 'number'), N = 'one'),
-        list(items = list('/', 'number'), N = 'one')
+        list(items = list('op', 'number'), N = 'one'),
+        list(items = list('op', 'func'), N = 'one'),
+        list(items = list('op', 'var'), N = 'one'),
       ),
       type = 'choice',
       N    = 'zero_or_more'
     )
+  ),
+  op = list(
+    items = list('+', '-', '*', '/'),
+    N = 'one',
+    type = 'choice'
+  ),
+  func = list(
+    list(items = list('cos', 'sin'), N = 'one', type = 'choice'),
+    list(items = list('(', 'term', ')'), N = 'one')
+  ),
+  var = list(
+    items = list('x', 'y'), N = 'one', type = 'choice'
   ),
   number = list(
     items = as.list(as.character(0:9)),
@@ -36,11 +49,12 @@ simple <- list(
 
 
 library(rlang)
-library(purrr)
+library(tidyverse)
 
 global_spec <- simple
 
 create <- function(spec) {
+  # browser()
   if (is.character(spec)) {
     if (spec %in% names(global_spec)) {
       return(create(global_spec[[spec]]))
@@ -62,7 +76,7 @@ create <- function(spec) {
     type <- spec$type %||% 'all'
 
     if (type == 'choice') {
-      items <- sample(spec$items, N)
+      items <- sample(spec$items, N, replace = TRUE)
     } else {
       items <- spec$items
     }
@@ -78,22 +92,64 @@ create <- function(spec) {
   res
 }
 
-
-
 spec <- simple$expr
 
 zz <- create(simple$expr)
 zz
-eval(parse(text = zz))
+
+fun <- function(x, y) {
+  eval(parse(text = zz))
+}
 
 
 
+make_fun <- function() {
+  zz <- create(simple$expr)
+
+  fun <- function(x, y) {
+    eval(parse(text = zz))
+  }
+}
+aargh_grid <- function(n) {
+
+  fun <- make_fun()
+
+  dat <- expand.grid(1:n, 1:n) %>%
+    as_tibble %>%
+    mutate(z = map2_dbl(Var1, Var2, fun))
+
+  p <- ggplot(aes(Var1, Var2)) +
+    geom_tile(aes(fill = log(z))) +
+    scale_fill_viridis_c(guide = "none") +
+    theme_void()
+  print(p)
+}
 
 
 
+aargh_grid(50)
+
+aargh_path <- function(seed1, seed2, n) {
+  fun <- make_fun()
+
+  print(fun)
+
+  x_vec <- vector("double", n)
+  y_vec <- vector("double", n)
+
+  x_vec[1] <- fun(seed1, seed2)
+  y_vec[1] <- fun(seed2, seed1)
+
+  for (i in seq_len(n - 1)) {
+    x_vec[i + 1] <- fun(x_vec[i], y_vec[i])
+    y_vec[i + 1] <- fun(y_vec[i], x_vec[i])
+  }
 
 
+  tibble(x = x_vec, y = y_vec)
+}
 
+aargh_path(1, 5, 5)
 
-
-
+ggplot(aargh_path(1, 5, 20), aes(x, y)) +
+  geom_path()
