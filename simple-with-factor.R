@@ -113,5 +113,6 @@ create <- function(spec, state) {
 spec <- simple$expr
 zz <- create(simple$expr, state = list(N = 1L))
 zz
+eval(parse(text = zz))
 
 
