@@ -1,0 +1,3 @@
+Expr ::= Term ('+' Term | '-' Term)*
+Term ::= Number ('*' Number | '/' Number)*
+Number ::= Digit+
