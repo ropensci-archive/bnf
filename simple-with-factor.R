@@ -79,11 +79,11 @@ create <- function(spec, state) {
       stop("Ugh N = ", N)
     )
 
-    if (state$N > 20 & Norig == 'zero_or_more') {
+    if (state$N > 50 & Norig == 'zero_or_more') {
       N <- 0
     }
 
-    if (state$N > 20 & Norig == 'one_or_more') {
+    if (state$N > 50 & Norig == 'one_or_more') {
       N <- 1
     }
 
