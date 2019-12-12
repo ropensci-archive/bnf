@@ -1,0 +1,5 @@
+Expr   ::= Term ('+' Term | '-' Term)* ;
+Term   ::= Factor ('*' Factor | '/' Factor)* ;
+Factor ::= ['-'] (Number | '(' Expr ')' | Call) ;
+Call   ::= ('cos(', Expr, ')' | 'sin(', Expr, ')') ;
+Number ::= Digit+ ;
