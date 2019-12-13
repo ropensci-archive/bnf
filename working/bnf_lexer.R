@@ -14,7 +14,7 @@ line3 <- "dummy ::= (a b)+ ;"
 line4 <- "dummy ::= (a | b | c)+ ;"
 line5 <- "dummy ::= (b | c)+ ;"
 
-line10 <- "Expr ::= Term ('+' Term | '-' Term)*"
+line10 <- "Expr ::= Term ('+' Term | '-' Term)* ;"
 
 simple_bnf <- "
 Expr   ::= Term ('+' Term | '-' Term)* ;
@@ -63,17 +63,14 @@ bnf_patterns <- c(
 )
 
 
-tokens <- lex(line1, patterns = bnf_patterns)
-tokens <- tokens[names(tokens) != 'whitespace']
-tokens <- gsub("'", "", tokens)
-tokens
-
 
 peek_type     <- function(tokens) {     names(tokens[ 1]) }
 peek_value    <- function(tokens) {    unname(tokens[ 1]) }
 consume_token <- function(tokens) { invisible(tokens[-1])  }
 assert_type   <- function(type, tokens) {
-  stopifnot(identical(peek_type(tokens), type))
+  if (!identical(peek_type(tokens), type)) {
+    stop("Expected type '", type, "' but got:", peek_type(tokens))
+  }
 }
 check_type <- function(type, tokens) {
   identical(peek_type(tokens), type)
@@ -92,19 +89,27 @@ split_while_type <- function(type, tokens) {
   list(lhs = lhs, rhs = rhs)
 }
 
+
+split_until_type <- function(type, tokens) {
+  pos <- which(names(tokens) == type)
+  if (length(pos) == 0 || pos[1] == length(tokens)) {
+    return(list(lhs=tokens, rhs=list())) # return all tokens if token not found
+  }
+  pos <- pos[1]
+
+  lhs <- tokens[1:pos]
+
+  rhs <- tokens[(pos+1):length(tokens)]
+  list(lhs = lhs, rhs = rhs)
+}
+
+
+
 end_of_tokens <- function(tokens) {length(tokens) == 0}
 
 
 `%notin%` <- Negate(`%in%`)
 
-# Parse rule
-assert_type('WORD', tokens)
-rule_name <- peek_value(tokens)
-tokens <- consume_token(tokens)
-assert_type('ASSIGN', tokens)
-tokens
-tokens <- consume_token(tokens)
-tokens
 
 # parse items
 item_delimiters <- c(
@@ -119,6 +124,8 @@ item_delimiters <- c(
 )
 
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 parse_items <- function(tokens) {
   items   <- list()
   sub_items   <- list()
@@ -181,8 +188,47 @@ parse_items <- function(tokens) {
   items
 }
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Parse rule
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+parse_bnf <- function(tokens) {
+  while (!end_of_tokens(tokens)) {
+
+    assert_type('WORD', tokens)
+    rule_name <- peek_value(tokens)
+    print(rule_name)
+    tokens <- consume_token(tokens) # consume the name
+    assert_type('ASSIGN', tokens)
+    tokens <- consume_token(tokens) # consume the assignemnt
+
+    split_tokens <- split_until_type('ENDOFRULE', tokens)
+    tokens      <- split_tokens$rhs
+    rule_tokens <- split_tokens$lhs
+    items <- parse_items(rule_tokens)
+    print("end")
+  }
+}
+
+
+
+tokens <- lex(simple_bnf, patterns = bnf_patterns)
+tokens <- tokens[names(tokens) != 'whitespace']
+tokens <- gsub("'", "", tokens)
+tokens
+parse_bnf(tokens)
+
+
+
+
+
+
+
 items <- parse_items(tokens)
 cat(paste(deparse(items), collapse = "\n"))
+
+
+
 
 
 # expr = list(
