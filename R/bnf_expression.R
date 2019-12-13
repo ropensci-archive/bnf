@@ -76,3 +76,17 @@ bnf_expression <- function(spec, global_spec,
 
   res
 }
+
+
+#' Make a function from a string
+#'
+#' @param expr A string (output from `bnf_expression`)
+#'
+#' @return A function
+#' @export
+#'
+bnf_function <- function(expr) {
+  fun <- function(x, y) {
+    eval(parse(text = expr))
+  }
+}
