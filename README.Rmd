@@ -26,7 +26,7 @@ font_add_google("Abril Fatface", "gf")
 
 
 ```{r echo = FALSE, eval = FALSE}
-img <- image_read("man/figures/goose.png")
+img <- image_read("man/figures/fish.gif")
 
 
 hexSticker::sticker(subplot  = img,
@@ -51,7 +51,7 @@ image_read("man/figures/logo.png")
 ```
 
 
-# bnf 
+# bnf <img src="man/figures/logo.png" align="right" height=230/>
 
 <!-- badges: start -->
 ![](https://img.shields.io/badge/very-experimental-orange.svg)
