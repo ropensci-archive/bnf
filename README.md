@@ -106,3 +106,18 @@ cat(paste(deparse(spec), collapse="\n"))
     #>             items = list("8"), N = "one", type = "all"), list(
     #>             items = list("9"), N = "one", type = "all")), N = "one_or_more", 
     #>         type = "choice")))
+
+``` r
+# Create a random bit of language from this grammar
+set.seed(2)
+lang <- bnf_expression(spec, spec)
+lang
+```
+
+    #> [1] "5-81+25+12*658/752*6/51"
+
+``` r
+eval(parse(text = lang))
+```
+
+    #> [1] -49.76471

@@ -102,7 +102,11 @@ cat(paste(deparse(spec), collapse="\n"))
 
 
 ```{r}
-
+# Create a random bit of language from this grammar
+set.seed(2)
+lang <- bnf_expression(spec, spec)
+lang
+eval(parse(text = lang))
 ```
 
 
