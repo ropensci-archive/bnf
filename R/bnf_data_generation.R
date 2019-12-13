@@ -1,10 +1,17 @@
+
+globalVariables(c('x', 'y'))
+
 #' Generate xy data from an expression
 #'
 #' @param f A function that accepts two numeric arguments and returns a single numeric value
 #' @param xdim An integer defining length of the x dimension
 #' @param ydim An integer defining length of the y dimension
+#' @param xby,yby seq steps in x and y directions
 #'
 #' @return A tibble
+#'
+#' @import purrr
+#' @import dplyr
 #' @export
 #'
 dat_generation_grid <- function(f, xdim = 20, xby = 1, ydim = 20, yby = 1) {
@@ -17,14 +24,17 @@ dat_generation_grid <- function(f, xdim = 20, xby = 1, ydim = 20, yby = 1) {
 
 #' Generate path data from an expression
 #'
-#' @param f
+#' @param fun function
 #' @param seed1 A double
 #' @param seed2 A double
+#' @param n number of points
 #'
 #' @return A tibble
+#'
+#' @import tibble
 #' @export
 #'
-dat_generation_path <- function(f, seed1, seed2, n) {
+dat_generation_path <- function(fun, seed1, seed2, n) {
   x_vec <- vector("double", n)
   y_vec <- vector("double", n)
 

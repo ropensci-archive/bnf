@@ -5,8 +5,12 @@
 #' @param zero_more_lambda poisson lambda for distribution of zero or mores
 #' @param one_more_lambda poisson lambda for distribution of one or mores
 #' @param zero_prob probability of a zero in for zero or one case
+#' @param state any state information to carry around.
 #'
-#' @return
+#' @return code generated from the given BNF
+#'
+#' @importFrom stats rpois
+#' @import purrr
 #' @export
 #'
 bnf_expression <- function(spec, global_spec,
