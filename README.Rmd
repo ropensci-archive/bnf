@@ -1,0 +1,85 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
+```{r echo = FALSE, eval = FALSE}
+# Quick logo generation. Borrowed heavily from Nick Tierney's Syn logo process
+library(magick)
+library(showtext)
+font_add_google("Abril Fatface", "gf")
+
+
+# pkgdown::build_site(override = list(destination = "../coolbutuseless.github.io/package/devout"))
+```
+
+
+```{r echo = FALSE, eval = FALSE}
+img <- image_read("man/figures/goose.png")
+
+
+hexSticker::sticker(subplot  = img,
+                    s_x      = 1,
+                    s_y      = 1.2,
+                    s_width  = 1.5,
+                    s_height = 1.5,
+                    package  = "bnf",
+                    p_x      = 1,
+                    p_y      = 0.6,
+                    p_color  = "#223344",
+                    p_family = "gf",
+                    p_size   = 9,
+                    h_size   = 1.2,
+                    h_fill   = "#ffffff",
+                    h_color  = "#223344",
+                    filename = "man/figures/logo.png")
+
+image_read("man/figures/logo.png")
+
+# <img src="man/figures/logo.png" align="right" height=230/>
+```
+
+
+# bnf 
+
+<!-- badges: start -->
+![](https://img.shields.io/badge/very-experimental-orange.svg)
+<!-- badges: end -->
+
+The goal of `bnf` is to parse grammar specifications in 
+[Backus–Naur form (BNF)](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) 
+and generate language from that grammar.
+
+The focus for #OzUnconf19 was to generate valid R code from a very restricted
+subset of the R grammar.
+
+This generated code was then used to calculated coordinates to visualise and turn into audio.
+
+## Installation
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("coolbutuseless/minilexer")
+devtools::install_github("ropenscilabs/bnf")
+```
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(bnf)
+## basic example code
+```
