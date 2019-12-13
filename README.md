@@ -6,6 +6,9 @@
 <!-- badges: start -->
 
 ![](https://img.shields.io/badge/very-experimental-orange.svg)
+![](https://img.shields.io/badge/silliness-extreme-red.svg)
+![](https://img.shields.io/badge/recursion-uncontrolled-red.svg)
+
 <!-- badges: end -->
 
 The goal of `bnf` is to parse grammar specifications in [Backus–Naur
