@@ -1,15 +1,24 @@
 Package: bnf
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Generate Language from BNF Grammars
+Version: 0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Mike",
+           family = "Cheng",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "mikefc@coolbutuseless.com"),
+      person(given = "Alex",
+           family = "Whan",
+           role = c("aut"),
+           email = "alexwhan@gmail.com"))
+Description: This package will parse BNF grammars into R representation and then
+    generate language from this grammar.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0
+Imports:
+    minilexer,
+    purrr,
+    dplyr,
+    tibble
