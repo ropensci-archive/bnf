@@ -28,13 +28,12 @@ devtools::install_github("coolbutuseless/minilexer")
 devtools::install_github("ropenscilabs/bnf")
 ```
 
-## Example
+## Turning BNF Grammar into Code
 
 1.  Need a grammar in BNF form
 2.  Turn this into an R list that we can compute on
 3.  Generate language from this grammar
 4.  Ask R to `eval()` this language
-5.  Plot it somehow
 
 <!-- end list -->
 
@@ -121,3 +120,19 @@ eval(parse(text = lang))
 ```
 
     #> [1] -49.76471
+
+## Generate Art: Using a grammar to create code which will calculate coordinates which can be plotted
+
+1.  More complicated grammar with some trig functions and function
+    nesting
+2.  Generate some R language
+3.  Evaluate the language at a number of grid points
+4.  Plot it\!
+
+<!-- end list -->
+
+``` r
+# Generate some R language from this grammar
+
+# plot it
+```
