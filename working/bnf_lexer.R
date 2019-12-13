@@ -193,6 +193,7 @@ parse_items <- function(tokens) {
 # Parse rule
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 parse_bnf <- function(tokens) {
+  bnf <- list()
   while (!end_of_tokens(tokens)) {
 
     assert_type('WORD', tokens)
@@ -206,8 +207,14 @@ parse_bnf <- function(tokens) {
     tokens      <- split_tokens$rhs
     rule_tokens <- split_tokens$lhs
     items <- parse_items(rule_tokens)
+
+    new_rule <- setNames(list(items = items), rule_name)
+
+    bnf <- c(bnf, new_rule)
+
     print("end")
   }
+  bnf
 }
 
 
@@ -216,8 +223,9 @@ tokens <- lex(simple_bnf, patterns = bnf_patterns)
 tokens <- tokens[names(tokens) != 'whitespace']
 tokens <- gsub("'", "", tokens)
 tokens
-parse_bnf(tokens)
+bnf <- parse_bnf(tokens)
 
+cat(paste(deparse(bnf), collapse = "\n"))
 
 
 
@@ -228,28 +236,5 @@ items <- parse_items(tokens)
 cat(paste(deparse(items), collapse = "\n"))
 
 
-
-
-
-# expr = list(
-#   list(items = list('term'), N = 'one'),
-#   list(
-#     items = list(
-#       list(items = list('+', 'term'), N = 'one'),
-#       list(items = list('-', 'term'), N = 'one')
-#     ),
-#     type = 'choice',
-#     N    = 'zero_or_more'
-#   )
-# )
-
-# list(
-#   list(items = list("Term"), N = "one", type = "all"),
-#   list(
-#     items = list(
-#       list(items = list("+", "Term"), N = "one", type = "all"),
-#       list(items = list("-", "Term"), N = "one", type = "all")),
-#     N = "zero_or_more", type = "choice")
-# )
 
 
