@@ -161,3 +161,8 @@ ggplot(dat_grid, aes(x, y)) +
 ``` r
 bnf::run_example()
 ```
+
+## ToDo
+
+  - Expand R grammar (full grammar is very complicated)
+  - Generate larger programs
