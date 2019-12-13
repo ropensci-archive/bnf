@@ -11,6 +11,9 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+library(ggplot2)
+library(bnf)
 ```
 
 
@@ -64,7 +67,8 @@ and generate language from that grammar.
 The focus for #OzUnconf19 was to generate valid R code from a very restricted
 subset of the R grammar.
 
-This generated code was then used to calculated coordinates to visualise and turn into audio.
+This generated code was then evaluated at multiple grid locations and plotted.
+
 
 ## Installation
 
@@ -116,11 +120,77 @@ eval(parse(text = lang))
 3. Evaluate the language at a number of grid points
 4. Plot it!
 
-```{r}
-# Generate some R language from this grammar
+```{r echo=FALSE}
+simple_spec <- list(
+  expr = list(
+    list(items = list('term'), N = 'one'),
+    list(
+      items = list(
+        list(items = list('op', 'term'), N = 'one'),
+        list(items = list('op', 'term'), N = 'one')
+      ),
+      type = 'choice',
+      N    = 'zero_or_more'
+    )
+  ),
+  term = list(
+    list(items = list('number'), N = 'one', type = 'all'),
+    list(
+      items = list(
+        list(items = list('op', 'number'), N = 'one'),
+        list(items = list('op', 'func'), N = 'one'),
+        list(items = list('op', 'var'), N = 'one')
+      ),
+      type = 'choice',
+      N    = 'zero_or_more'
+    )
+  ),
+  op = list(
+    items = list('+', '-', '*', '/'),
+    N = 'one',
+    type = 'choice'
+  ),
+  func = list(
+    list(items = list('cos', 'sin'), N = 'one', type = 'choice'),
+    list(items = list('(', 'term', ')'), N = 'one')
+  ),
+  var = list(
+    items = list('x', 'y'), N = 'one', type = 'choice'
+  ),
+  number = list(
+    items = as.list(as.character(0:9)),
+    N     = 'one_or_more',
+    type  = 'choice'
+  )
+)
 
-# plot it
 ```
 
 
+
+```{r warning=FALSE}
+# Generate some R language from this grammar
+set.seed(16)
+lang <- bnf_expression(simple_spec$expr, simple_spec, 1.5, 1.5)
+lang
+
+# Evaluate this language at multiple points on a grid
+fun <- bnf_function(lang)
+dat_grid <- bnf::dat_generation_grid(fun, 200, 0.15, 200, 0.15)
+
+# plot it
+ggplot(dat_grid, aes(x, y)) +
+  geom_tile(aes(fill = abs(log(z)))) +
+  theme_void() + 
+  theme(legend.position = 'none') +
+  scale_fill_viridis_c(na.value = '#440154FF') +
+  coord_equal()
+```
+
+
+## Shiny app
+
+```{r eval = FALSE}
+
+```
 

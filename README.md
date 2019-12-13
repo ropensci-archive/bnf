@@ -133,6 +133,25 @@ eval(parse(text = lang))
 
 ``` r
 # Generate some R language from this grammar
+set.seed(16)
+lang <- bnf_expression(simple_spec$expr, simple_spec, 1.5, 1.5)
+lang
+```
+
+    #> [1] "733-758+x/348*x+sin(52/cos(68+cos(80+sin(123)+66/y)+cos(713+x-x))/x)*447"
+
+``` r
+# Evaluate this language at multiple points on a grid
+fun <- bnf_function(lang)
+dat_grid <- bnf::dat_generation_grid(fun, 200, 0.15, 200, 0.15)
 
 # plot it
+ggplot(dat_grid, aes(x, y)) +
+  geom_tile(aes(fill = abs(log(z)))) +
+  theme_void() + 
+  theme(legend.position = 'none') +
+  scale_fill_viridis_c(na.value = '#440154FF') +
+  coord_equal()
 ```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
