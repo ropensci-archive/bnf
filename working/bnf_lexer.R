@@ -8,11 +8,11 @@ source(here::here('working', 'lexer.R'))
 # Number ::= ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')+
 
 line0 <- "dummy ::= a b c ;"
-line1 <- "dummy ::= a | b | c ;"
+line1 <- "dummy ::= (a | b c | d e f) ;"
 line2 <- "dummy ::= (a)+ ;"
 line3 <- "dummy ::= (a b)+ ;"
 line4 <- "dummy ::= (a | b | c)+ ;"
-
+line5 <- "dummy ::= (b | c)+ ;"
 
 line10 <- "Expr ::= Term ('+' Term | '-' Term)*"
 
@@ -41,6 +41,7 @@ Number ::= ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')+ ;
 # '+' and '*' modifiers are only allowed on bracketed expressions
 # '[]' delimits an optional item i.e. N = 'zero_or_one'
 # '()' delimits a choice
+# '| is only allowed inside '()' for delimiting choices
 # QWORD is a quoted word - only single quotes allowed
 # WORD is a bare word. Eventually WORD and QWORD should be
 #      treated differently, but for now i just look up all words to
@@ -62,7 +63,7 @@ bnf_patterns <- c(
 )
 
 
-tokens <- lex(line0, patterns = bnf_patterns)
+tokens <- lex(line1, patterns = bnf_patterns)
 tokens <- tokens[names(tokens) != 'whitespace']
 tokens <- gsub("'", "", tokens)
 tokens
@@ -120,48 +121,89 @@ item_delimiters <- c(
 
 parse_items <- function(tokens) {
   items   <- list()
+  sub_items   <- list()
   has_ORs <- FALSE
   while (peek_type(tokens) %notin% item_delimiters && !end_of_tokens(tokens)) {
     items  <- append(items, peek_value(tokens))
     tokens <- consume_token(tokens)
   }
 
-  if (check_type('LBRACKET', tokens)) {
+  if (length(items) > 0) {
+    items <- list(items = items, N = 'one', type = 'all')
+  } else {
+    items <- NULL
+  }
+
+  if (check_type('LBRACKET', tokens) || check_type('SLBRACKET', tokens)) {
     tokens <- consume_token(tokens)
+
+    sub_has_ORs <- FALSE
     while (peek_type(tokens) %notin% item_delimiters) {
-      split_tokens <- split_while_type('WORD', tokens)
-      tokens <- split_tokens$rhs
-      sub_items <- parse_items(split_tokens$lhs)
-      items <- append(items, sub_items)
+      split_tokens  <- split_while_type('WORD', tokens)
+      sub_sub_items <- parse_items(split_tokens$lhs)
+      sub_items     <- append(sub_items, list(sub_sub_items))
+
+      tokens       <- split_tokens$rhs
+      if (check_type('OR', tokens)) {
+        sub_has_ORs <- TRUE
+        tokens <- consume_token(tokens)
+      }
     }
+
+    if (end_of_tokens(tokens)) {
+      sub_N <- 'one'
+    } else if (check_type('RBRACKET', tokens) || check_type('ENDOFRULE', tokens)) {
+      sub_N <- 'one'
+      tokens <- consume_token(tokens)
+    } else if (check_type('RBRACKET1P', tokens)) {
+      sub_N <- 'one_or_more'
+      tokens <- consume_token(tokens)
+    } else if (check_type('RBRACKET0P', tokens)) {
+      sub_N <- 'zero_or_more'
+      tokens <- consume_token(tokens)
+    } else if (check_type('SRBRACKET', tokens)) {
+      sub_N <- 'zero_or_one'
+      tokens <- consume_token(tokens)
+    } else {
+      stop("Sub Ugh Ugh: ", peek_type(tokens), " : ", peek_value(tokens))
+    }
+
+    if (sub_has_ORs) {
+      type <- 'choice'
+    } else {
+      type <- 'all'
+    }
+
+    sub_items <- list(items = sub_items, N = sub_N, type = type)
+    items <- c(list(items), list(sub_items))
   }
 
-  if (check_type('RBRACKET', tokens) || end_of_tokens(tokens) || check_type('ENDOFRULE', tokens)) {
-    N <- 'one'
-  } else if (check_type('RBRACKET1P', tokens)) {
-    N <- 'one_or_more'
-  } else if (check_type('RBRACKET0P', tokens)) {
-    N <- 'zero_or_more'
-  } else if (check_type('SRBRACKET', tokens)) {
-    N <- 'zero_or_one'
-  } else {
-    stop("Ugh Ugh: ", peek_type(tokens), " : ", peek_value(tokens))
-  }
-
-  if (has_ORs) {
-    type <- 'choice'
-  } else {
-    type <- 'all'
-  }
-
-  list(items = items, N = N, type = type)
+  items
 }
 
 items <- parse_items(tokens)
-cat(deparse(items))
+cat(paste(deparse(items), collapse = "\n"))
 
-# N    <- 'one'
-# type <- 'all'
-#
-# rule <- setNames(list(list(items = items, N = N, type = type)), rule_name)
-# cat(deparse(rule))
+
+# expr = list(
+#   list(items = list('term'), N = 'one'),
+#   list(
+#     items = list(
+#       list(items = list('+', 'term'), N = 'one'),
+#       list(items = list('-', 'term'), N = 'one')
+#     ),
+#     type = 'choice',
+#     N    = 'zero_or_more'
+#   )
+# )
+
+# list(
+#   list(items = list("Term"), N = "one", type = "all"),
+#   list(
+#     items = list(
+#       list(items = list("+", "Term"), N = "one", type = "all"),
+#       list(items = list("-", "Term"), N = "one", type = "all")),
+#     N = "zero_or_more", type = "choice")
+# )
+
+
