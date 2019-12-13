@@ -15,8 +15,8 @@ generate language from that grammar.
 The focus for \#OzUnconf19 was to generate valid R code from a very
 restricted subset of the R grammar.
 
-This generated code was then used to calculated coordinates to visualise
-and turn into audio.
+This generated code was then evaluated at multiple grid locations and
+plotted.
 
 ## Installation
 
@@ -155,3 +155,9 @@ ggplot(dat_grid, aes(x, y)) +
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+## Shiny app
+
+``` r
+bnf::run_example()
+```

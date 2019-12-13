@@ -191,6 +191,6 @@ ggplot(dat_grid, aes(x, y)) +
 ## Shiny app
 
 ```{r eval = FALSE}
-
+bnf::run_example()
 ```
 

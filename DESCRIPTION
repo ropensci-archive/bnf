@@ -22,3 +22,5 @@ Imports:
     purrr,
     dplyr,
     tibble
+Suggests:
+    shiny

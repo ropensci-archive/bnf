@@ -1,9 +1,6 @@
 #' run_example
 #'
-#' @return
 #' @export
-#'
-#' @examples
 run_example <- function() {
   if(!requireNamespace("shiny", quietly = TRUE)) {
     stop("The shiny package is not available. Install with `install.packages('shiny')`.")
