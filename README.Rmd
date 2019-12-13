@@ -6,7 +6,7 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
+  collapse = FALSE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
@@ -77,9 +77,37 @@ devtools::install_github("ropenscilabs/bnf")
 ```
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+1. Need a grammar in BNF form
+2. Turn this into an R list that we can compute on
+3. Generate language from this grammar
+4. Ask R to `eval()` this language
+5. Plot it somehow
+
 
 ```{r example}
 library(bnf)
-## basic example code
+
+# BNF grammar for a simple calculator
+cat(bnf:::simple_bnf)
+
+# Turn the BNF into tokens (to make it easier to manipulate)
+tokens <- bnf::parse_bnf_text_to_tokens(bnf:::simple_bnf)
+tokens
+
+# Turn the tokens into an internal nexted list representation that we can 
+# compute on.  This is a *deeply* nested list.
+spec <- bnf::parse_bnf_tokens_to_spec(tokens)
+cat(paste(deparse(spec), collapse="\n"))
 ```
+
+
+```{r}
+
+```
+
+
+
+
+
+
+

@@ -30,9 +30,79 @@ devtools::install_github("ropenscilabs/bnf")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+1.  Need a grammar in BNF form
+2.  Turn this into an R list that we can compute on
+3.  Generate language from this grammar
+4.  Ask R to `eval()` this language
+5.  Plot it somehow
+
+<!-- end list -->
 
 ``` r
 library(bnf)
-## basic example code
+
+# BNF grammar for a simple calculator
+cat(bnf:::simple_bnf)
 ```
+
+    #> 
+    #> Expr   ::= Term ('+' Term | '-' Term)* ;
+    #> Term   ::= Number ('*' Number | '/' Number)* ;
+    #> Number ::= ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')+ ;
+
+``` r
+# Turn the BNF into tokens (to make it easier to manipulate)
+tokens <- bnf::parse_bnf_text_to_tokens(bnf:::simple_bnf)
+tokens
+```
+
+    #>       WORD     ASSIGN       WORD   LBRACKET       WORD       WORD         OR 
+    #>     "Expr"      "::="     "Term"        "("        "+"     "Term"        "|" 
+    #>       WORD       WORD RBRACKET0P  ENDOFRULE       WORD     ASSIGN       WORD 
+    #>        "-"     "Term"       ")*"       " ;"     "Term"      "::="   "Number" 
+    #>   LBRACKET       WORD       WORD         OR       WORD       WORD RBRACKET0P 
+    #>        "("        "*"   "Number"        "|"        "/"   "Number"       ")*" 
+    #>  ENDOFRULE       WORD     ASSIGN   LBRACKET       WORD         OR       WORD 
+    #>       " ;"   "Number"      "::="        "("        "0"        "|"        "1" 
+    #>         OR       WORD         OR       WORD         OR       WORD         OR 
+    #>        "|"        "2"        "|"        "3"        "|"        "4"        "|" 
+    #>       WORD         OR       WORD         OR       WORD         OR       WORD 
+    #>        "5"        "|"        "6"        "|"        "7"        "|"        "8" 
+    #>         OR       WORD RBRACKET1P  ENDOFRULE 
+    #>        "|"        "9"       ")+"       " ;"
+
+``` r
+# Turn the tokens into an internal nexted list representation that we can 
+# compute on.  This is a *deeply* nested list.
+spec <- bnf::parse_bnf_tokens_to_spec(tokens)
+```
+
+    #> Parsing: Expr
+
+    #> Parsing: Term
+
+    #> Parsing: Number
+
+``` r
+cat(paste(deparse(spec), collapse="\n"))
+```
+
+    #> list(Expr = list(list(items = list("Term"), N = "one", type = "all"), 
+    #>     list(items = list(list(items = list("+", "Term"), N = "one", 
+    #>         type = "all"), list(items = list("-", "Term"), N = "one", 
+    #>         type = "all")), N = "zero_or_more", type = "choice")), 
+    #>     Term = list(list(items = list("Number"), N = "one", type = "all"), 
+    #>         list(items = list(list(items = list("*", "Number"), N = "one", 
+    #>             type = "all"), list(items = list("/", "Number"), 
+    #>             N = "one", type = "all")), N = "zero_or_more", type = "choice")), 
+    #>     Number = list(NULL, list(items = list(list(items = list("0"), 
+    #>         N = "one", type = "all"), list(items = list("1"), N = "one", 
+    #>         type = "all"), list(items = list("2"), N = "one", type = "all"), 
+    #>         list(items = list("3"), N = "one", type = "all"), list(
+    #>             items = list("4"), N = "one", type = "all"), list(
+    #>             items = list("5"), N = "one", type = "all"), list(
+    #>             items = list("6"), N = "one", type = "all"), list(
+    #>             items = list("7"), N = "one", type = "all"), list(
+    #>             items = list("8"), N = "one", type = "all"), list(
+    #>             items = list("9"), N = "one", type = "all")), N = "one_or_more", 
+    #>         type = "choice")))
