@@ -1,5 +1,5 @@
 Package: bnf
-Title: Generate Language from BNF Grammars
+Title: Generate Code from BNF Grammars
 Version: 0.1.1
 Authors@R: 
     c(person(given = "Mike",
@@ -10,8 +10,8 @@ Authors@R:
            family = "Whan",
            role = c("aut"),
            email = "alexwhan@gmail.com"))
-Description: This package will parse BNF grammars into R representation and then
-    generate language from this grammar.
+Description: This package parse can parse BNF grammars into R representation. 
+    This representation can then be used to generate random code from this grammar.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

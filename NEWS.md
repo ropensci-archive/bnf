@@ -1,5 +1,5 @@
 
-# bnf 0.1.1 (20191213)
+# bnf 0.1.1 (20191214)
 
 * Renamed files and functions for clarity
 * Minor parser changes
@@ -18,6 +18,6 @@
     * switched over to an actual parsed BNF (it used to be a pre-generated 
       grammar representation)
 
-# bnf 0.1.0 (20191212)
+# bnf 0.1.0 (20191213)
 
 * Initial release at #OzUnconf19
