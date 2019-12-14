@@ -1,38 +1,39 @@
-library(shiny)
-library(bnf)
+
 
 function(input, output) {
 
-  # code <- ""
   code <- reactive({
     input$generate
-    bnf_expression(simple$expr, simple, 1, 1)
+    bnf::generate_code(
+      bnf_spec  = spec,
+      bnf_rule  = spec$Expr,
+      lambda0p  = input$lambda0p,
+      lambda1p  = input$lambda1p
+    )
   })
 
   output$code <- renderText(code())
 
-  dat_path <- reactive({
-    fun <- bnf_function(code())
-    dat_path <- bnf::dat_generation_path(fun, 5, 1, 50)
-  })
-
   dat_grid <- reactive({
-    fun <- bnf_function(code())
-    dat_path <- bnf::dat_generation_grid(fun, 100,0.5, 100, 0.5)
-  })
-
-  output$plotpath <- renderPlot({
-    ggplot(dat_path(), aes(x, y)) +
-      geom_path() +
-      theme_void()
+    suppressWarnings({
+      dat_path <- bnf::eval_grid(code(), xmin=0, xmax=input$xmax, xn = input$res)
+    })
+    dat_path
   })
 
   output$plotgrid <- renderPlot({
-    ggplot(dat_grid(), aes(x, y)) +
-      geom_tile(aes(fill = log(z))) +
-      theme_void()
+    plot_df <- dat_grid()
+
+    if (isTRUE(input$log)) {
+      plot_df$z <- suppressWarnings(log(plot_df$z))
+    }
+
+    ggplot(plot_df, aes(x, y)) +
+      geom_tile(aes(fill = z)) +
+      theme_void() +
+      theme(legend.position = 'none') +
+      scale_fill_viridis_c(na.value = '#440154FF') +
+      coord_equal()
   })
-  #
-  # output$plotpath
 
 }

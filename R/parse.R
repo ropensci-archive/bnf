@@ -1,4 +1,8 @@
 
+plist <- function(ll) {
+  cat(paste(trimws(deparse(ll, width.cutoff = 500)), collapse = " "))
+}
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Some simple BNFs to work with
@@ -18,8 +22,9 @@ Number ::= ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')+ ;
 simple_bnf_with_functions <- "
 Expr   ::= Term ('+' Term | '-' Term)* ;
 Term   ::= Factor ('*' Factor | '/' Factor)* ;
-Factor ::= ['-'] (Number | '(' Expr ')' | Call) ;
+Factor ::= (Number | Var | '(' Expr ')' | Call) ;
 Call   ::= ('cos(' Expr ')' | 'sin(' Expr ')') ;
+Var    ::= ('x' | 'y') ;
 Number ::= ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')+ ;
 "
 
@@ -136,7 +141,7 @@ parse_items <- function(tokens) {
   }
 
   if (length(items) > 0) {
-    items <- list(items = items, N = 'one', type = 'all')
+    items <- list(items = items)
   } else {
     items <- NULL
   }
@@ -158,9 +163,9 @@ parse_items <- function(tokens) {
     }
 
     if (end_of_tokens(tokens)) {
-      sub_N <- 'one'
+      sub_N <- NULL
     } else if (check_type('RBRACKET', tokens) || check_type('ENDOFRULE', tokens)) {
-      sub_N <- 'one'
+      sub_N <- NULL
       tokens <- consume_token(tokens)
     } else if (check_type('RBRACKET1P', tokens)) {
       sub_N <- 'one_or_more'
@@ -178,11 +183,18 @@ parse_items <- function(tokens) {
     if (sub_has_ORs) {
       type <- 'choice'
     } else {
-      type <- 'all'
+      type <- NULL
     }
 
-    sub_items <- list(items = sub_items, N = sub_N, type = type)
-    items <- c(list(items), list(sub_items))
+    sub_items      <- list(items = sub_items)
+    sub_items$N    <- sub_N
+    sub_items$type <- type
+
+    if (is.null(items)) {
+      items <- sub_items
+    } else {
+      items <- c(list(items), list(sub_items))
+    }
   }
 
   items
@@ -190,10 +202,10 @@ parse_items <- function(tokens) {
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' Parse tokens lexed from BNF
+#' Parse tokens lexed from BNF text into the R nested list representation
 #'
 #' @param tokens named character vector of tokens from lex()
-#' @return Internal BNF representation
+#' @return R nested list representation of the BNF grammar
 #'
 #' @importFrom stats setNames
 #' @export
@@ -204,7 +216,6 @@ parse_bnf_tokens_to_spec <- function(tokens) {
 
     assert_type('WORD', tokens)
     rule_name <- peek_value(tokens)
-    message("Parsing: ", rule_name)
     tokens <- consume_token(tokens) # consume the name
     assert_type('ASSIGN', tokens)
     tokens <- consume_token(tokens) # consume the assignemnt
@@ -220,7 +231,6 @@ parse_bnf_tokens_to_spec <- function(tokens) {
   }
   bnf
 }
-
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,14 +251,19 @@ parse_bnf_text_to_tokens <- function(bnf_text) {
 }
 
 
-
-
-
-if (FALSE) {
-  bnf_text <- simple_bnf
-  tokens   <- parse_bnf_text_to_tokens(bnf_text)
-  spec     <- parse_bnf_tokens_to_spec(tokens)
-
-  cat(paste(deparse(spec), collapse = "\n"))
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' Parse BNF text into an R data structure
+#'
+#' TODO: detail what flavour of BNF is supported.
+#'
+#' @param bnf_text string containing the BNF rules
+#'
+#' @return nested list representing the BNF
+#' @export
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+parse_bnf <- function(bnf_text) {
+  tokens <- parse_bnf_text_to_tokens(bnf_text)
+  spec   <- parse_bnf_tokens_to_spec(tokens)
+  spec
 }
 
