@@ -4,7 +4,7 @@
 # bnf <img src="man/figures/logo.png" align="right" height=230 />
 
 <!-- badges: start -->
-
+[![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
 ![](https://img.shields.io/badge/recursion-insane-green.svg)
 ![](https://img.shields.io/badge/silliness-extreme-blue.svg)
 ![](https://img.shields.io/badge/code-experimental-orange.svg)
